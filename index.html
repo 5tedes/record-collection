@@ -14290,10 +14290,6 @@
 
             // Store filtered records globally for modal access
             currentFilteredRecords = filteredRecords;
-                    record.Title.toLowerCase().includes(query) ||
-                    record.Label.toLowerCase().includes(query)
-                );
-            }
 
             if (filteredRecords.length === 0) {
                 grid.innerHTML = '<div class="no-results">No albums found</div>';
