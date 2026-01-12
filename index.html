@@ -211,8 +211,8 @@
 
         .collection-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
             animation: fadeInUp 0.8s ease-out 0.2s both;
         }
 
@@ -261,11 +261,13 @@
         }
 
         .album-art img {
-            width: 100%;
-            height: 100%;
+            width: 80%;
+            height: 80%;
             object-fit: cover;
+            border-radius: 8px;
             position: relative;
             z-index: 1;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .album-art .placeholder {
@@ -375,6 +377,243 @@
                 width: 100%;
             }
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            border: 1px solid var(--border);
+            position: relative;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .modal-artwork {
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .modal-artwork::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 107, 53, 0.1), transparent);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .modal-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-artwork .placeholder {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 6rem;
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-details {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .modal-artist {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .modal-info-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .modal-format-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(255, 107, 53, 0.15);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 6px;
+            color: var(--accent-primary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        .discogs-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+
+        .discogs-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        @media (max-width: 968px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .modal-artwork {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 20px;
+            }
+
+            .modal-body {
+                padding: 30px 20px;
+            }
+
+            .modal-header h2 {
+                font-size: 2rem;
+            }
+
+            .info-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -400,9 +639,57 @@
         </footer>
     </div>
 
+    <!-- Album Detail Modal -->
+    <div id="albumModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-body">
+                <div class="modal-artwork" id="modalArtwork">
+                    <div class="placeholder">♪</div>
+                </div>
+                <div class="modal-details">
+                    <div class="modal-header">
+                        <h2 id="modalTitle">Album Title</h2>
+                        <div class="modal-artist" id="modalArtist">Artist Name</div>
+                    </div>
+                    <div class="modal-info-grid">
+                        <div class="info-row">
+                            <div class="info-label">Label</div>
+                            <div class="info-value" id="modalLabel">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Catalog #</div>
+                            <div class="info-value" id="modalCatalog">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Format</div>
+                            <div class="info-value">
+                                <span class="modal-format-badge" id="modalFormat">CD</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Released</div>
+                            <div class="info-value" id="modalYear">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Added</div>
+                            <div class="info-value" id="modalAdded">-</div>
+                        </div>
+                    </div>
+                    <a href="#" id="modalDiscogsLink" class="discogs-link" target="_blank">
+                        View on Discogs →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const DISCOGS_TOKEN = 'dbsqdsJNgEylRqqYrYbZzMfWOmXvDmYEJnzEPTyg';
-        const data = {
+        
+        let data = null;
+        let records = [];
+        let formatGroups = {};
   "records": [
     {
       "Catalog#": "!K7073CD",
@@ -13905,22 +14192,44 @@
         "CollectionFolder": "DTS-CD",
         "Date Added": "2025-08-16 12:06:45"
       }
-    ]
-  }
-};
-        
         let currentFormat = 'All';
         let searchQuery = '';
         let albumArtCache = {};
-        const records = data.records;
-        const formatGroups = data.formats;
+
+        // Load collection data from external JSON file
+        async function loadData() {
+            try {
+                const response = await fetch('collection_data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                data = await response.json();
+                records = data.records;
+                formatGroups = data.formats;
+                return true;
+            } catch (error) {
+                console.error('Error loading collection data:', error);
+                document.getElementById('collectionGrid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+                        <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; margin-bottom: 20px; color: var(--accent-primary);">
+                            Error Loading Collection
+                        </h2>
+                        <p>Failed to load collection_data.json. Please make sure the file is in the same directory as index.html.</p>
+                    </div>
+                `;
+                return false;
+            }
+        }
 
         // Initialize the page
-        function init() {
-            renderStats();
-            renderTabs();
-            renderCollection();
-            setupEventListeners();
+        async function init() {
+            const loaded = await loadData();
+            if (loaded) {
+                renderStats();
+                renderTabs();
+                renderCollection();
+                setupEventListeners();
+            }
         }
 
         function renderStats() {
@@ -13979,16 +14288,23 @@
                 );
             }
 
+            // Store filtered records globally for modal access
+            currentFilteredRecords = filteredRecords;
+                    record.Title.toLowerCase().includes(query) ||
+                    record.Label.toLowerCase().includes(query)
+                );
+            }
+
             if (filteredRecords.length === 0) {
                 grid.innerHTML = '<div class="no-results">No albums found</div>';
                 return;
             }
 
-            grid.innerHTML = filteredRecords.map(record => {
+            grid.innerHTML = filteredRecords.map((record, index) => {
                 const year = record.Released || 'N/A';
                 const format = record.CollectionFolder;
                 return `
-                    <div class="album-card" data-release-id="${record.release_id}">
+                    <div class="album-card" data-record-index="${index}" onclick="openModal(${index})">
                         <div class="album-art" data-release-id="${record.release_id}">
                             <div class="loading-spinner"></div>
                         </div>
@@ -14074,6 +14390,93 @@
                 renderCollection();
             });
         }
+
+        let currentFilteredRecords = [];
+
+        function openModal(index) {
+            const record = currentFilteredRecords[index];
+            if (!record) return;
+
+            // Populate modal content
+            document.getElementById('modalTitle').textContent = record.Title;
+            document.getElementById('modalArtist').textContent = record.Artist;
+            document.getElementById('modalLabel').textContent = record.Label || '-';
+            document.getElementById('modalCatalog').textContent = record['Catalog#'] || '-';
+            document.getElementById('modalFormat').textContent = record.CollectionFolder;
+            document.getElementById('modalYear').textContent = record.Released || 'N/A';
+            document.getElementById('modalAdded').textContent = record['Date Added'] ? new Date(record['Date Added']).toLocaleDateString() : '-';
+
+            // Set Discogs link
+            const discogsUrl = record.release_id && record.release_id !== '0' 
+                ? `https://www.discogs.com/release/${record.release_id}` 
+                : '#';
+            document.getElementById('modalDiscogsLink').href = discogsUrl;
+
+            // Load artwork
+            const modalArtwork = document.getElementById('modalArtwork');
+            const releaseId = record.release_id;
+            
+            if (albumArtCache[releaseId]) {
+                // Use cached image
+                if (albumArtCache[releaseId]) {
+                    modalArtwork.innerHTML = `<img src="${albumArtCache[releaseId]}" alt="Album Art">`;
+                } else {
+                    modalArtwork.innerHTML = '<div class="placeholder">♪</div>';
+                }
+            } else {
+                // Show loading state
+                modalArtwork.innerHTML = '<div class="loading-spinner"></div>';
+                
+                // Fetch from API if not cached
+                if (releaseId && releaseId !== '0') {
+                    fetch(`https://api.discogs.com/releases/${releaseId}`, {
+                        headers: {
+                            'Authorization': `Discogs token=${DISCOGS_TOKEN}`,
+                            'User-Agent': 'RecordCollection/1.0'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const imageUrl = data.images && data.images[0] ? data.images[0].uri : null;
+                        albumArtCache[releaseId] = imageUrl;
+                        if (imageUrl) {
+                            modalArtwork.innerHTML = `<img src="${imageUrl}" alt="Album Art">`;
+                        } else {
+                            modalArtwork.innerHTML = '<div class="placeholder">♪</div>';
+                        }
+                    })
+                    .catch(() => {
+                        modalArtwork.innerHTML = '<div class="placeholder">♪</div>';
+                    });
+                } else {
+                    modalArtwork.innerHTML = '<div class="placeholder">♪</div>';
+                }
+            }
+
+            // Show modal
+            document.getElementById('albumModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('albumModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('albumModal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
 
         function escapeHtml(text) {
             const div = document.createElement('div');
