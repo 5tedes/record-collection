@@ -1,0 +1,49 @@
+name: Update Collection
+
+on:
+  push:
+    paths:
+      - '*.csv'  # Triggers when any CSV file is pushed
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  update-collection:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for proper commit
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Find CSV file
+      id: find-csv
+      run: |
+        CSV_FILE=$(ls -t *.csv 2>/dev/null | head -n 1)
+        if [ -z "$CSV_FILE" ]; then
+          echo "No CSV file found"
+          exit 1
+        fi
+        echo "csv_file=$CSV_FILE" >> $GITHUB_OUTPUT
+        echo "Found CSV file: $CSV_FILE"
+    
+    - name: Update collection
+      run: |
+        python update_collection.py ${{ steps.find-csv.outputs.csv_file }}
+    
+    - name: Commit changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add collection_data.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update collection from CSV" && git push)
+    
+    - name: Summary
+      run: |
+        echo "✅ Collection updated successfully!"
+        echo "The website will automatically reflect the changes."
