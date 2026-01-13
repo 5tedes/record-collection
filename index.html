@@ -694,10 +694,6 @@
         let searchQuery = '';
         let albumArtCache = {};
         let currentFilteredRecords = [];
-    {
-      "Catalog#": "!K7073CD",
-      "Artist": "Kruder & Dorfmeister",
-      "Title": "The K&D Sessions\u2122",
 
         // Load collection data from external JSON file
         async function loadData() {
@@ -713,11 +709,34 @@
             } catch (error) {
                 console.error('Error loading collection data:', error);
                 document.getElementById('collectionGrid').innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-secondary); max-width: 800px; margin: 0 auto;">
                         <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; margin-bottom: 20px; color: var(--accent-primary);">
-                            Error Loading Collection
+                            Cannot Load Collection Data
                         </h2>
-                        <p>Failed to load collection_data.json. Please make sure the file is in the same directory as index.html.</p>
+                        <p style="margin-bottom: 20px; line-height: 1.8;">
+                            ${error.message || 'Failed to load collection_data.json'}
+                        </p>
+                        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 30px; text-align: left; margin-top: 30px;">
+                            <h3 style="color: var(--accent-secondary); margin-bottom: 15px; font-size: 1.1rem;">⚠️ Common Issue: File Protocol</h3>
+                            <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                                If you opened this file directly (file:// in the URL), browsers block loading JSON files for security reasons.
+                            </p>
+                            <p style="margin-bottom: 10px; color: var(--text-primary); font-weight: 700;">Solution - Use a local web server:</p>
+                            <pre style="background: var(--bg-primary); padding: 15px; border-radius: 6px; overflow-x: auto; margin: 10px 0; border: 1px solid var(--border);">
+<code style="color: var(--accent-primary); font-family: 'Space Mono', monospace; font-size: 0.85rem;">
+# With Python 3:
+python3 -m http.server 8000
+
+# Or with Python 2:
+python -m SimpleHTTPServer 8000
+
+# Or with Node.js (install first: npm install -g http-server):
+npx http-server
+</code></pre>
+                            <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;">
+                                Then open: <span style="color: var(--accent-primary);">http://localhost:8000</span>
+                            </p>
+                        </div>
                     </div>
                 `;
                 return false;
@@ -726,6 +745,14 @@
 
         // Initialize the page
         async function init() {
+            // Show loading state
+            document.getElementById('collectionGrid').innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-secondary);">
+                    <div class="loading-spinner" style="margin: 0 auto 20px;"></div>
+                    <p>Loading collection data...</p>
+                </div>
+            `;
+
             const loaded = await loadData();
             if (loaded) {
                 renderStats();
@@ -889,8 +916,6 @@
                 renderCollection();
             });
         }
-
-        let currentFilteredRecords = [];
 
         function openModal(index) {
             const record = currentFilteredRecords[index];
