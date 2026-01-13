@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Collection Test</title>
+</head>
+<body>
+    <h1>Testing Collection Data Load</h1>
+    <div id="status">Loading...</div>
+    <div id="results"></div>
+
+    <script>
+        async function testLoad() {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+
+            try {
+                status.textContent = 'Fetching collection_data.json...';
+                const response = await fetch('collection_data.json');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                status.textContent = 'Parsing JSON...';
+                const data = await response.json();
+
+                status.textContent = '✅ SUCCESS!';
+                results.innerHTML = `
+                    <h2>Data Loaded Successfully!</h2>
+                    <p>Records: ${data.records ? data.records.length : 0}</p>
+                    <p>Formats: ${data.formats ? Object.keys(data.formats).join(', ') : 'none'}</p>
+                    <h3>First 3 records:</h3>
+                    <pre>${JSON.stringify(data.records.slice(0, 3), null, 2)}</pre>
+                `;
+            } catch (error) {
+                status.textContent = '❌ FAILED';
+                results.innerHTML = `
+                    <h2>Error:</h2>
+                    <p style="color: red;">${error.message}</p>
+                    <p>Current URL: ${window.location.href}</p>
+                    <p>Protocol: ${window.location.protocol}</p>
+                    <h3>Troubleshooting:</h3>
+                    <p>If protocol is "file:", you need to use a local server:</p>
+                    <pre>python3 serve.py</pre>
+                    <p>Then open: http://localhost:8000/test_page.html</p>
+                `;
+            }
+        }
+
+        testLoad();
+    </script>
+</body>
+</html>
