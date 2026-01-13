@@ -686,7 +686,9 @@
 
     <script>
         const DISCOGS_TOKEN = 'dbsqdsJNgEylRqqYrYbZzMfWOmXvDmYEJnzEPTyg';
-        
+        const CACHE_VERSION = 'v1';
+        const CACHE_EXPIRY_DAYS = 30;
+
         let data = null;
         let records = [];
         let formatGroups = {};
@@ -694,6 +696,49 @@
         let searchQuery = '';
         let albumArtCache = {};
         let currentFilteredRecords = [];
+
+        // Persistent cache management using localStorage
+        function loadCacheFromStorage() {
+            try {
+                const cached = localStorage.getItem(`albumArtCache_${CACHE_VERSION}`);
+                if (cached) {
+                    const { data, timestamp } = JSON.parse(cached);
+                    const now = Date.now();
+                    const expiryMs = CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+
+                    // Check if cache is still valid
+                    if (now - timestamp < expiryMs) {
+                        albumArtCache = data;
+                        console.log(`Loaded ${Object.keys(albumArtCache).length} album covers from cache`);
+                        return Object.keys(albumArtCache).length;
+                    } else {
+                        // Cache expired, clear it
+                        localStorage.removeItem(`albumArtCache_${CACHE_VERSION}`);
+                        console.log('Album art cache expired, cleared');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading cache from localStorage:', error);
+            }
+            return 0;
+        }
+
+        function saveCacheToStorage() {
+            try {
+                const cacheData = {
+                    data: albumArtCache,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(`albumArtCache_${CACHE_VERSION}`, JSON.stringify(cacheData));
+            } catch (error) {
+                console.error('Error saving cache to localStorage:', error);
+                // If storage is full, clear old cache and try again
+                if (error.name === 'QuotaExceededError') {
+                    localStorage.removeItem(`albumArtCache_${CACHE_VERSION}`);
+                    console.log('localStorage full, cleared album art cache');
+                }
+            }
+        }
 
         // Load collection data from external JSON file
         async function loadData() {
@@ -745,11 +790,15 @@ npx http-server
 
         // Initialize the page
         async function init() {
+            // Load cached album art from localStorage
+            const cachedCount = loadCacheFromStorage();
+
             // Show loading state
             document.getElementById('collectionGrid').innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-secondary);">
                     <div class="loading-spinner" style="margin: 0 auto 20px;"></div>
                     <p>Loading collection data...</p>
+                    ${cachedCount > 0 ? `<p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 10px;">Loaded ${cachedCount} cached album covers</p>` : ''}
                 </div>
             `;
 
@@ -851,6 +900,8 @@ npx http-server
         }
 
         async function loadAlbumArt(records) {
+            let newlyCachedCount = 0;
+
             for (const record of records) {
                 const releaseId = record.release_id;
                 if (!releaseId || releaseId === '0') continue;
@@ -874,16 +925,30 @@ npx http-server
                         const imageUrl = data.images && data.images[0] ? data.images[0].uri : null;
                         albumArtCache[releaseId] = imageUrl;
                         updateAlbumArt(releaseId, imageUrl);
+                        newlyCachedCount++;
+
+                        // Save to localStorage every 10 new images to avoid too many writes
+                        if (newlyCachedCount % 10 === 0) {
+                            saveCacheToStorage();
+                        }
                     } else {
+                        albumArtCache[releaseId] = null;
                         updateAlbumArt(releaseId, null);
                     }
                 } catch (error) {
                     console.error(`Error fetching art for release ${releaseId}:`, error);
+                    albumArtCache[releaseId] = null;
                     updateAlbumArt(releaseId, null);
                 }
 
                 // Rate limiting: wait 1 second between requests
                 await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            // Final save to catch any remaining images
+            if (newlyCachedCount > 0) {
+                saveCacheToStorage();
+                console.log(`Cached ${newlyCachedCount} new album covers to localStorage`);
             }
         }
 
@@ -968,8 +1033,11 @@ npx http-server
                         } else {
                             modalArtwork.innerHTML = '<div class="placeholder">♪</div>';
                         }
+                        // Save to localStorage after fetching
+                        saveCacheToStorage();
                     })
                     .catch(() => {
+                        albumArtCache[releaseId] = null;
                         modalArtwork.innerHTML = '<div class="placeholder">♪</div>';
                     });
                 } else {
